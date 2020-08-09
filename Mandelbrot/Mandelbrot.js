@@ -17,7 +17,7 @@ function setup() {
     if(window.Worker) {
 
         for(let i = 0; i < 4; i++) {
-            workers.push(new Worker("Worker.js"));
+            workers.push(new Worker("Mandelbrot/Worker.js"));
             workers[i].addEventListener("message", onWorkerMessage);
         }
 

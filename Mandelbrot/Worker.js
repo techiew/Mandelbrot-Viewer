@@ -48,8 +48,8 @@ function calculateMandelbrot(x1Pos, x2Pos, y1Pos, y2Pos, width, height, startRow
 
             let pixel = x * 4
             rowPixels[pixel + 0] = color * 2;
-            rowPixels[pixel + 1] = color * 2;
-            rowPixels[pixel + 2] = color / 2;
+            rowPixels[pixel + 1] = 0;
+            rowPixels[pixel + 2] = 0;
             rowPixels[pixel + 3] = 255;
         }
 
