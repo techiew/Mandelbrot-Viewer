@@ -1,9 +1,9 @@
 
 // Screen edge coords
-let x1Pos = -3;
-let x2Pos = 2;
-let y1Pos = 2;
-let y2Pos = -2;
+let x1Pos = -2.3;
+let x2Pos = 1.3;
+let y1Pos = 1.3;
+let y2Pos = -1.3;
 
 let workers = [];
 let needToDraw = true;
@@ -12,26 +12,17 @@ let zoomSpeed = 0.1;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    clearBackground();
-
-    if(window.Worker) {
-
-        for(let i = 0; i < 4; i++) {
-            workers.push(new Worker("Mandelbrot/Worker.js"));
-            workers[i].addEventListener("message", onWorkerMessage);
-        }
-
-    }
-
+    requestDraw();
 }
 
 function draw() {
 
     if(needToDraw) {
+        respawnWorkers();
 
         for(let i = 0; i < workers.length; i++) {
-            let startRow = windowHeight / workers.length * i;
-            let endRow = windowHeight / workers.length * (i + 1);
+            let startRow = Math.floor(windowHeight / workers.length * i);
+            let endRow = Math.floor(windowHeight / workers.length * (i + 1));
 
             if(window.Worker) {
                 workers[i].postMessage({
@@ -43,13 +34,31 @@ function draw() {
                         "height": windowHeight,
                         "startRow": startRow,
                         "endRow": endRow,
-                        "iterations": maxIterations
+                        "maxIterations": maxIterations
                     });
             }
 
         }
 
         needToDraw = false;
+    }
+
+}
+
+function respawnWorkers() {
+
+    if(window.Worker) {
+
+        for(let i = 0; i < 4; i++) {
+
+            if(typeof workers[i] !== "undefined") {
+                workers[i].terminate();
+            }
+
+            workers[i] = new Worker("Mandelbrot/Worker.js");
+            workers[i].addEventListener("message", onWorkerMessage);
+        }
+
     }
 
 }
@@ -73,7 +82,8 @@ function onWorkerMessage(e) {
 }
 
 function requestDraw() {
-    clearBackground();
+    background(10, 10, 15);
+    loadPixels();
     needToDraw = true;
 }
 
@@ -107,7 +117,7 @@ function smoothPass() {
     updatePixels();
 }
 
-function clearBackground() {
+/*function clearBackground() {
     loadPixels();
 
     for(let i = 0; i < pixels.length; i++) {
@@ -119,7 +129,7 @@ function clearBackground() {
     }
 
     updatePixels();
-}
+}*/
 
 function mousePressed() {
     if(mouseButton != LEFT) return;
@@ -134,8 +144,6 @@ function mousePressed() {
     y2Pos += mouseOffsetY - centerY;
 
     requestDraw();
-
-    //smoothPass();
     return false;
 }
 
