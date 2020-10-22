@@ -5,7 +5,7 @@ function maxIterationsChanged(value) {
 }
 
 function colorChanged(value) {
-    color = value;
+    color1 = value;
     requestDraw();
 }
 
