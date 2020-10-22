@@ -1,30 +1,32 @@
+"use strict";
 
 let buffer = [];
 
 onmessage = function(e) {
-    let x1Pos = e.data.x1Pos;
-    let x2Pos = e.data.x2Pos;
-    let y1Pos = e.data.y1Pos;
-    let y2Pos = e.data.y2Pos;
-    let width = e.data.width;
-    let height = e.data.height;
-    let startRow = e.data.startRow;
-    let endRow = e.data.endRow;
-    let maxIterations = e.data.maxIterations;
-    calculateMandelbrot(x1Pos, x2Pos, y1Pos, y2Pos, width, height, startRow, endRow, maxIterations);
+    let j = e.data;
+    let order = j[0];
+    let x1Pos = j[1];
+    let x2Pos = j[2];
+    let y1Pos = j[3];
+    let y2Pos = j[4];
+    let width = j[5];
+    let height = j[6];
+    let maxIterations = j[7];
+    let color1 = j[8];
+    calculateMandelbrot(order, x1Pos, x2Pos, y1Pos, y2Pos, width, height, maxIterations, color1);
 }
 
-function calculateMandelbrot(x1Pos, x2Pos, y1Pos, y2Pos, width, height, startRow, endRow, maxIterations) {
-    let numRows = endRow - startRow;
-    let y = startRow;
-    let count = 1;
+function calculateMandelbrot(order, x1Pos, x2Pos, y1Pos, y2Pos, width, height, maxIterations, color1) {
+    let date = new Date();
+    let startTime = date.getTime();
 
-    for(let row = 0; row < numRows; row++) {
+    for(let row = 0; row < order.length; row++) {
         let rowPixels = [];
+        let y = order[row];
 
         for(let x = 0; x < width; x++) {
 
-            // Map the x and y coords of the window to a reasonable range for the Mandelbrot set
+            // Map the current x and y coords in the window to a reasonable range for the Mandelbrot set
             let a = map(x, 0, width, x1Pos, x2Pos);
             let b = map(y, 0, height, y1Pos, y2Pos);
 
@@ -35,53 +37,45 @@ function calculateMandelbrot(x1Pos, x2Pos, y1Pos, y2Pos, width, height, startRow
 
             let iterations = 0;
             let colorIntensity = 0;
-            let red = 1.0;
-            let green = 1.0;
-            let blue = 1.0;
 
             for(; iterations < maxIterations; iterations++) {
                 z = mandelbrot(z, c);
 
-                // This gets the absolute value of the complex number z
-                // If it's higher than 2 then this sequence will escape
-                // We color it according to how long it took to escape (number of iterations)
+                // This checks the absolute value of the complex number z
+                // If it's higher than 2 then that means the sequence will escape and we just stop
                 if(Math.sqrt(z[0] * z[0] + z[1] * z[1]) > 2) {
-                    colorIntensity = colorModeNormal(z, iterations, maxIterations);
+                    // The following code decides how each pixel should be colored, based on how long it took to escape (number of iterations)
+                    // I found this on the internet somewhere cause I suck at math, this equation makes the coloring more smooth
+                    colorIntensity = iterations + 1 - Math.log(Math.log(Math.abs(z[0] * z[0] + z[1] * z[1]))) / Math.log(2);
+                    colorIntensity = 255 * iterations / maxIterations;
+                    colorIntensity = colorIntensity * (colorIntensity / 10); // Creates bigger contrast
                     break;
                 }
 
             }
 
-            let borderColor = green;
-            let outerColor = blue;
-            let borderSize = 100;
+            let modifier = map(iterations, 0, maxIterations, 0, 1);
+            let color = [lerp(color1[0], 1.0, modifier), lerp(color1[1], 1.0, modifier), lerp(color1[2], 1.0, modifier)];
 
-            red = map(iterations, 0, maxIterations, 0, 20);
-            green = map(iterations, 0, maxIterations, 0, 20);
-            //blue = map(iterations, 0, maxIterations, 0, 20);
-
+            // Here we set the actual colors for each pixel on the canvas
             let pixel = x * 4
-            rowPixels[pixel + 0] = colorIntensity * red;
-            rowPixels[pixel + 1] = colorIntensity * green;
-            rowPixels[pixel + 2] = colorIntensity * blue;
-            rowPixels[pixel + 3] = 255;
+            rowPixels[pixel + 0] = colorIntensity * color[0] // red
+            rowPixels[pixel + 1] = colorIntensity * color[1]; // green
+            rowPixels[pixel + 2] = colorIntensity * color[2]; // blue
+            rowPixels[pixel + 3] = 255; // alpha
         }
 
         onRowCompleted(y, rowPixels);
-        y += 10;
 
-        if(y + 1 > endRow) {
-            y = startRow + count;
-            count++;
-        }
-
-        if(y % 3 == 0) {
+        if(row % 4 == 0) {
             sendData();
         }
 
     }
 
     sendData();
+    date = new Date()
+    console.log("Chunk complete in: " + (date.getTime() - startTime) + "ms");
 }
 
 // f(z) = z² + c
@@ -95,7 +89,7 @@ function mandelbrot(z, c) {
     return z;
 }
 
-function wolfbrot(z, c) {
+function demonbrot(z, c) {
     // Square z
     //z.real = z.real * z.real - z.imaginary * z.imaginary;
     //z.imaginary = 2 * z.real * z.imaginary;
@@ -104,23 +98,20 @@ function wolfbrot(z, c) {
     //z.imaginary = z.imaginary + c.imaginary;
 }
 
-function colorModeNormal(z, iterations, maxIterations) {
-    let intensity = iterations + 1 - Math.log(Math.log(Math.abs(z[0] * z[0] + z[1] * z[1]))) / Math.log(2);
-    return intensity = 255 * iterations / maxIterations;
-}
-
-function colorModeWavy(z, iterations, maxIterations) {
-    let intensity = iterations + 1 - Math.log(Math.log(Math.abs(z[0] * z[0] + z[1] * z[1]))) / Math.log(2);
-    return intensity *= 255;
-}
-
+// Store pixeldata for rows in a buffer so we can send the data in batches,
+// because WebWorkers don't like sending messages too fast.
 function onRowCompleted(rowIndex, rowPixels) {
-    buffer.push({"rowIndex": rowIndex, "rowPixels": rowPixels});
+    buffer.push([rowIndex, rowPixels]);
 }
 
 function sendData() {
     postMessage(buffer);
     buffer = [];
+}
+
+// Linear interpolation
+function lerp(value1, value2, percent) {
+    return value1 * (1 - percent) + value2 * percent;
 }
 
 function map(number, fromMin, fromMax, toMin, toMax) {
