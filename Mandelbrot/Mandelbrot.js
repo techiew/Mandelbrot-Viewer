@@ -19,7 +19,7 @@ function setup() {
     createCanvas(windowWidth, windowHeight);
     pixelDensity(1);
     ui = QuickSettings.create(50, 50, "Options");
-    ui.addHTML("Info", "<div> <ul style='padding-left: 17px; margin-top: 5px;'> <li>Left click to move around</li> <li>Mouse wheel to zoom</li> <li>Right click to save/view image</li> <li>Press 1 to hide this menu</li></ul> </div>");
+    ui.addHTML("Info", "<div> <ul style='padding-left: 17px; margin-top: 5px;'> <li>Left click to move around</li> <li>Mouse wheel to zoom</li> <li>Right click to save/view image</li> <li>Increase max iterations for more detail</li> <li>Press 1 to hide this menu</li> </ul> </div>");
     ui.addNumber("Max Iterations", 0, 999999999999999999, maxIterations, 500, maxIterationsChanged);
     ui.addColor("Color", color1, colorChanged);
     ui.addRange("Num Workers", 1, 16, numWorkers, 1, onNumWorkersChanged);

@@ -22,5 +22,7 @@ function onResetZoom(value) {
     x2Pos = 1.3;
     y1Pos = 1.3;
     y2Pos = -1.3;
+    maxIterations = 1000;
+    ui.setValue("Max Iterations", 1000);
     requestDraw();
 }
