@@ -1,5 +1,12 @@
 
 function maxIterationsChanged(value) {
+    let regEx = /[a-zA-Z]/g;
+
+    if(regEx.test(value)) {
+        print("lol");
+        return;
+    }
+
     maxIterations = value;
     requestDraw();
 }
@@ -22,7 +29,7 @@ function onResetZoom(value) {
     x2Pos = 1.3;
     y1Pos = 1.3;
     y2Pos = -1.3;
-    maxIterations = 1000;
-    ui.setValue("Max Iterations", 1000);
+    maxIterations = 500;
+    ui.setValue("Max Iterations", 500);
     requestDraw();
 }
