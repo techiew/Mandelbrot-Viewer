@@ -82,14 +82,11 @@ function mandelbrot(y, x1Pos, x2Pos, y1Pos, y2Pos, width, height, maxIterations,
     return pixels;
 }
 
-//function demonbrot(z, c) {
-    // Square z
-    //z.real = z.real * z.real - z.imaginary * z.imaginary;
-    //z.imaginary = 2 * z.real * z.imaginary;
-    // Add z with c
-    //z.real = z.real + c.real,
-    //z.imaginary = z.imaginary + c.imaginary;
-//}
+// This caused an interesting effect
+//z.real = z.real * z.real - z.imaginary * z.imaginary;
+//z.imaginary = 2 * z.real * z.imaginary;
+//z.real = z.real + c.real,
+//z.imaginary = z.imaginary + c.imaginary;
 
 // Linear interpolation
 function lerp(value1, value2, percent) {

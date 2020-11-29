@@ -5,8 +5,6 @@ let x1Pos = -2.3;
 let x2Pos = 1.3;
 let y1Pos = 1.3;
 let y2Pos = -1.3;
-let xRatio;
-let yRatio;
 
 let workers = [];
 let numWorkers = 4; // More than 4 can cause bad performance because of too many worker messages
@@ -20,8 +18,6 @@ let ui;
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    xRatio = (x2Pos - x1Pos) / 1920;
-    yRatio = (y1Pos - y2Pos) / 1080;
     noSmooth();
     pixelDensity(1);
     ui = QuickSettings.create(50, 50, "Options");
@@ -272,12 +268,6 @@ function keyPressed() {
 }
 
 function windowResized() {
-    x1Pos -= xRatio * (windowWidth - width);
-    x2Pos += xRatio * (windowWidth - width);
-    y1Pos += yRatio * (windowHeight - height);
-    y2Pos -= yRatio * (windowHeight - height);
     resizeCanvas(windowWidth, windowHeight);
-    xRatio = (x2Pos - x1Pos) / width;
-    yRatio = (y1Pos - y2Pos) / height;
     requestDraw();
 }
