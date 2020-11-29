@@ -24,10 +24,10 @@ function onZoomSpeedChanged(value) {
 }
 
 function onResetZoom(value) {
-    x1Pos = -2.3;
-    x2Pos = 1.3;
-    y1Pos = 1.3;
-    y2Pos = -1.3;
+    x1Pos = -2.8;
+    x2Pos = 2.2;
+    y1Pos = 1.2;
+    y2Pos = -1.2;
     maxIterations = 500;
     ui.setValue("Max Iterations", 500);
     requestDraw();

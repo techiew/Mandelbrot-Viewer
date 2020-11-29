@@ -1,10 +1,10 @@
 "use strict";
 
 // Screen edge coords
-let x1Pos = -2.3;
-let x2Pos = 1.3;
-let y1Pos = 1.3;
-let y2Pos = -1.3;
+let x1Pos = -2.8;
+let x2Pos = 2.2;
+let y1Pos = 1.2;
+let y2Pos = -1.2;
 
 let workers = [];
 let numWorkers = 4; // More than 4 can cause bad performance because of too many worker messages
