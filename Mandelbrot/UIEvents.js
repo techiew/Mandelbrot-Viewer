@@ -3,7 +3,6 @@ function maxIterationsChanged(value) {
     let regEx = /[a-zA-Z]/g;
 
     if(regEx.test(value)) {
-        print("lol");
         return;
     }
 
